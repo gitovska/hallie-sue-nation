@@ -1,2 +1,3 @@
 # ignore .env to prevent pushing API key
 .env
+.idea
