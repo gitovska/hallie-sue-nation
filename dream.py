@@ -12,12 +12,12 @@ def create_key(seed=0):
     return jax.random.PRNGKey(seed)
 rng = create_key(0)
 
-image_path = ""
+image_path = "../zihang.jpg"
 with open(image_path, "rb") as ib:
     init_img = Image.open(BytesIO(ib.read())).convert("RGB")
 init_img = init_img.resize((768, 512))
 
-prompts = ""
+prompts = "superheros are people who build things in the style of a dream"
 
 pipeline, params = FlaxStableDiffusionImg2ImgPipeline.from_pretrained(
     "CompVis/stable-diffusion-v1-4", revision="bf16", dtype=jax.numpy.bfloat16
@@ -36,11 +36,11 @@ output = pipeline(
     params=p_params, 
     prng_seed=rng, 
     strength=0.5, 
-    num_inference_steps=100, 
+    num_inference_steps=150, 
     jit=True, 
     height=512,
     width=768).images
 
 output_images = pipeline.numpy_to_pil(np.asarray(output.reshape((num_samples,) + output.shape[-3:])))
 for i in range(len(output_images)):
-    output_images[i].save(f"{i}.bmp")
+    output_images[i].save(f"../output/{i}.bmp")

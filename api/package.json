@@ -1,0 +1,12 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT"
+i}
+{
+  "scripts": {
+    "start": "now dev",
+    "build": "now --prod"
+  }
+}
