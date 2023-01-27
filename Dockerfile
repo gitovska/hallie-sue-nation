@@ -7,7 +7,17 @@ CMD ["/sbin/my_init"]
 # install python 
 RUN apt update -y \
     && apt install python3 -y \
-    && apt install python3-pip -y \
+    && apt install python3-pip -y
+
+# set up webhook server
+RUN apt install npm -y \
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    apt update \
+    install --no-install-recommends yarn \
+    npm i -g now \
+    mkdir api && cd api
+    yarn init -y
 
 # install git and clone repo
 RUN apt install git -y \
