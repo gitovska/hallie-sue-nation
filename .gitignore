@@ -2,3 +2,4 @@
 .env
 .idea
 mentions.json
+.ipynb_checkpoints
