@@ -34,7 +34,7 @@ image_size = 356
 
 loader = transforms.Compose(
     [
-        transforms.Resize((image_size, image_size)),
+        transforms.Resize((512, 768)),
         transforms.ToTensor()
 
     ]
