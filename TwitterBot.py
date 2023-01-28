@@ -11,19 +11,24 @@ import pandas as pd
         # User-Lookup/get_users_with_bearer_token.py
         # User-Mention-Timeline/user_mentions.py
         # Manage-Tweets/create_tweet.py
+
 class TwitterBot:
+
     def __init__(self):
         load_dotenv(".env")
         self.__oauth = OAuth1Session(
             client_key=os.getenv('TWITTER_CONSUMER_KEY'),
             client_secret=os.getenv('TWITTER_CONSUMER_SECRET'),
             resource_owner_key=os.getenv('TWITTER_ACCESS_TOKEN'),
-            resource_owner_secret=os.getenv('TWITTER_ACCESS_TOKEN_SECRET'),
+            resource_owner_secret=os.getenv('TWITTER_ACCESS_TOKEN_SECRET')
         )
         try:
             self.__mentions_df = pd.read_json('data/mentions.json')
         except ValueError and FileNotFoundError:
             self.__mentions_df = pd.DataFrame()
+
+
+    # Private Class Methods
 
     def _get_request(self, url, params=None):
         if params:
@@ -44,7 +49,6 @@ class TwitterBot:
         if response.status_code != 201:
             raise Exception(f"Request returned an error: {response.status_code} {response.text}")
 
-        # Saving the response as JSON and printing
         json_response = response.json()
         print(f"Status: {response.status_code} - Tweet Posted!\n", json.dumps(json_response, indent=4, sort_keys=True))
 
@@ -112,6 +116,9 @@ class TwitterBot:
         full_mentions = pd.concat([self.__mentions_df, new_mentions], axis=0)
         full_mentions.reset_index(drop=True, inplace=True)
         full_mentions.to_json('data/mentions.json')
+
+
+    # Public Class Methods
 
     def mentions(self, username):
         user_id = self._get_user_id(username)
