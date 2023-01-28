@@ -22,9 +22,8 @@ def get_next_tweet(df: pd.DataFrame) -> pd.DataFrame:
     return unprocessed_tweets.head(1)
 
 def get_prompts(tweet: str) -> list[str]:
-    #prep = Preprocessor()
-    #prompts = prep.get_prompts(prompt)
-    return [tweet] * 8
+    prep = Preprocessor()
+    return prep.get_prompts(tweet)
 
 
 if __name__ == "__main__":
