@@ -9,7 +9,6 @@ RUN apt update -y \
     && apt install python3 -y \
     && apt install python3-pip -y
 
-
 # install git and clone repo
 RUN apt install git -y \
     git clone https://github.com/gitovska/hallie-sue-nation.git \
