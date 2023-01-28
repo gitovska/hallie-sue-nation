@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 import torchvision.models as models
 from torchvision.utils import save_image
 
-
+# the tutorial "Pytorch Neural Style Transfer Tutorial" from Youtube channel "Aladdin Persson" was used.
 class VGG(nn.Module):
     def __init__(self):
         super(VGG,self).__init__()
