@@ -1,3 +1,4 @@
+import requests
 from requests_oauthlib import OAuth1Session
 import os
 import json
@@ -30,7 +31,7 @@ class TwitterBot:
 
     # Private Class Methods
 
-    def _get_request(self, url, params=None):
+    def _get_request(self, url: str, params: dict = None) -> requests.Response:
         if params:
             response = self.__oauth.get(url, params=params)
         else:
@@ -40,7 +41,7 @@ class TwitterBot:
             raise Exception(f"Request returned an error: {response.status_code} {response.text}")
         return response
 
-    def _post_request(self, tweet):
+    def _post_request(self, tweet: str) -> requests.Response:
         """
         Sends a post request with a tweet in JSON format.
         Example: tweet = {"text": "Hello world!"}
@@ -48,11 +49,11 @@ class TwitterBot:
         response = self.__oauth.post("https://api.twitter.com/2/tweets", json=tweet)
         if response.status_code != 201:
             raise Exception(f"Request returned an error: {response.status_code} {response.text}")
+        else:
+            print("Tweet Posted!\n", json.dumps(response.json(), indent=4, sort_keys=True))
+        return response
 
-        json_response = response.json()
-        print(f"Status: {response.status_code} - Tweet Posted!\n", json.dumps(json_response, indent=4, sort_keys=True))
-
-    def _get_user_id(self, username):
+    def _get_user_id(self, username: str) -> str:
         base_url = "https://api.twitter.com/2/users"
         url = f"{base_url}/by?usernames={username}"
         params = {"user.fields": "id,description,created_at"}
@@ -61,7 +62,7 @@ class TwitterBot:
         json_response = response.json()
         return json_response["data"][0]["id"]
 
-    def _get_mention_ids(self, user_id):
+    def _get_mention_ids(self, user_id: str) -> list[str]:
         base_url = "https://api.twitter.com/2/users"
         url = f"{base_url}/{user_id}/mentions"
 
@@ -69,7 +70,7 @@ class TwitterBot:
         mentions = mentions_response.json()
         return [mention['id'] for mention in mentions['data']]
 
-    def _query_mentions(self, mention_ids):
+    def _query_mentions(self, mention_ids: list[str]) -> pd.DataFrame:
 
         if not self.__mentions_df.empty:
             query_ids = [tweet_id for tweet_id in mention_ids if tweet_id not in self.__mentions_df['id']]
@@ -112,7 +113,7 @@ class TwitterBot:
 
         return new_mentions_df.merge(media_df, how='outer', on='media_key')
 
-    def _write_mentions(self, new_mentions):
+    def _write_mentions(self, new_mentions: pd.DataFrame):
         full_mentions = pd.concat([self.__mentions_df, new_mentions], axis=0)
         full_mentions.reset_index(drop=True, inplace=True)
         if not os.path.isdir('data'):
@@ -122,13 +123,13 @@ class TwitterBot:
 
     # Public Class Methods
 
-    def mentions(self, username):
+    def mentions(self, username: str):
         user_id = self._get_user_id(username)
         mention_ids = self._get_mention_ids(user_id)
         new_mentions = self._query_mentions(mention_ids)
-        full_mentions = self._write_mentions(new_mentions)
+        self._write_mentions(new_mentions)
 
-    def tweet(self, tweet_string, image=None):
+    def tweet(self, tweet_string: str, image=None):
         if image:
             tweet = {"text": tweet_string}
         else:
