@@ -1,6 +1,5 @@
-import spacy, re, openai, random
+import re, openai, random
 from dotenv import dotenv_values
-from spacy_download import load_spacy
 from nltk import sent_tokenize
 
 
@@ -40,7 +39,7 @@ class Preprocessor():
         # split url from the content
         content_part = re.split("http:",content_part)[0]
 
-        return content_part, hashtags
+        return content_part
 
     def _get_noun_verb(self, tagger: object, tweet: str) -> tuple[set, set]:
         """
@@ -80,79 +79,7 @@ class Preprocessor():
 
         return set(noun_list),set(verb_list)
 
-    def _generate_prompts(self,nounSet:set,verbSet:set, content_part:str) -> [str]:
-        """
-
-        :param nounSet: the set of nouns from the tweet
-        :param verbSet: the set of verbs from the tweet
-        :return: maximal 8 prompts generated from the noun and verb sets with help of gpt3
-
-        in this version: this function is not in use
-
-        motivation: 1. we want about 8 different prompts based on the verbs and nouns the tweet has.
-        2. The prompt has to be grammatically simple, meaning each prompt only has one verb.
-        3. 1 and 2 leads to the decision, that we create several keywords list which consists of the whole noun set and
-        a verb from the verb set. The number of the keywords list equals the number of verbs in verb set.
-
-        Each keywords list would then be passed into pgt3 to generate number of 8//len(verbSet) prompts. Each prompt will
-        be appended with substring "in the surrealistic style". As the photo generated from diffusion model appears often
-        "weird" or does not fit into real world logic. We decide to take advantage of that and push the generated photo even
-        further into surrealism realm with the substring "in the surrealistic style". The result turns out to fit well with
-        the project's framing: the Twitter account should draw photos of your dream, and dream is often blurred and
-        surrealistic
-        """
-
-        # get number of prompts for each verb
-        prompts_num = 8//len(verbSet)
-
-        # result prompt later for return
-        prompts_list_from_pgt3 = []
-
-        # only allow one verb in a prompt
-        verb_list = list(verbSet)
-
-        for verb in verb_list:
-
-            # iter through the verb list, and create at each iter a keyward list(nouns + 1 verb)
-            token_list = list(nounSet)
-            token_list.append(verb)
-
-            # shuffle the token list, as the order of the tokens affect the quality of prompt. Just in case
-            # gpt3 always generate bad prompts with a specific token order
-            random.shuffle(token_list)
-
-            # create prompt for gpt3
-            #prompt = "Generate a noun phrase with keywords" + ", ".join(token_list)
-            prompt = "Summarize the story with a noun phrase:" + content_part
-
-            # send the prompt for gpt3 into gpt3 api
-            completions = openai.Completion.create(
-                engine="text-curie-001",
-                prompt=prompt,
-                max_tokens=12,
-                n=prompts_num,
-                temperature=1, # high temperature gives gpt3 more creativity room
-                presence_penalty=1,
-            )
-
-            # add generated prompts from gpt3 to list
-            prompts_list_from_pgt3 = prompts_list_from_pgt3 + [x.text for x in completions.choices]
-
-        # get rid of \n in the prompt
-        prompts_list_from_pgt3 = [x.replace("\n","") for x in prompts_list_from_pgt3]
-
-        # get rid of half sentences
-        #prompts_list_from_pgt3 = [x.split(",")[0] for x in prompts_list_from_pgt3]
-
-        # change the word I to me and was/were to as
-        #prompts_list_from_pgt3 = [x.replace["was"] for x in prompts_list_from_pgt3]
-
-        # append style
-        prompts_list_from_pgt3 = [x + " in the surreal style" for x in prompts_list_from_pgt3]
-
-        return prompts_list_from_pgt3
-
-    def _generate_prompts2(self, content_part: str) -> [str]:
+    def _generate_prompts(self, content_part: str) -> [str]:
         """
         :param content_part: tweet text
         :return: list of prompts from gpt
@@ -180,7 +107,7 @@ class Preprocessor():
         story_text.lower()
 
         # split the complex long sentences into shorter sentences
-        to_replace = [".", "!", ",", "and", "then", "until","but","so","if","when","that"]
+        to_replace = [".", "!", ",", "and", "then", "until","but","so","if","when","that","because"]
         for x in to_replace:
             story_text = story_text.replace(x, ".")
         prompts = sent_tokenize(story_text)
@@ -212,7 +139,7 @@ class Preprocessor():
 
         return prompts_list_from_pgt3
 
-    # function to call from outside
+    # public function
     def get_prompts(self, raw_tweet: str) -> list[str]:
         """
 
@@ -221,13 +148,10 @@ class Preprocessor():
         """
 
         # preprocess raw_tweet
-        tweet, _ = self._tweet_process(raw_tweet)
-
-        # get the noun, verb set
-        #nouns, verbs = get_noun_verb(nlp, tweet)
+        tweet= self._tweet_process(raw_tweet)
 
         # generate prompts with gpt3
-        prompt_list = self._generate_prompts2(tweet)
+        prompt_list = self._generate_prompts(tweet)
 
         return prompt_list
 
