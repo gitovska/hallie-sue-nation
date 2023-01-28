@@ -79,6 +79,7 @@ class TwitterBot:
 
         url = "https://api.twitter.com/2/tweets?"
         params = {"ids": ",".join(query_ids),
+                  "tweet.fields": "created_at",
                   "expansions": "attachments.media_keys",
                   "media.fields": "media_key,alt_text,height,width,type,url",
                   }
@@ -86,7 +87,7 @@ class TwitterBot:
         tweets_response = self._get_request(url, params)
         tweets_response_json = tweets_response.json()
 
-        new_mentions_df = pd.DataFrame(columns=['id', 'text', 'media_key', 'processed'])
+        new_mentions_df = pd.DataFrame(columns=['id', 'text', 'media_key', 'created_at', 'processed'])
         for tweet in tweets_response_json['data']:
             tweet.setdefault('attachments', False)
             new_tweet = {}
@@ -96,9 +97,11 @@ class TwitterBot:
                 new_tweet['media_key'] = tweet['attachments']['media_keys'][0]
             else:
                 new_tweet['media_key'] = None
+            new_tweet['created_at'] = tweet['created_at']
             new_tweet['processed'] = False
             new_mentions_df.loc[len(new_mentions_df)] = new_tweet.values()
             new_mentions_df['id'].apply(lambda x: int(x))
+            new_mentions_df['created_at'].apply(lambda x: pd.to_datetime(x))
 
         media_fields = ['media_key', 'height', 'width', 'url', 'type']
         media_df = pd.DataFrame(columns=media_fields)
