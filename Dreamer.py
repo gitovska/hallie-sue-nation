@@ -7,6 +7,14 @@ from io import BytesIO
 from PIL import Image
 from diffusers import FlaxStableDiffusionImg2ImgPipeline
 
+
+# The following guide to running Stable Diffusion on a TPU used as the basis for the Dreamer.
+# https://huggingface.co/blog/stable_diffusion_jax
+
+# The stable_diffusion_jax colab notebook was modified with the help of the FlaxStableDiffusionImg2ImgPipeline
+# sample code in the readme of the huggingface/diffusers repo
+# github.com/huggingface/diffusers
+
 class Dreamer:
 
     def __init__(self):
