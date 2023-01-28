@@ -1,5 +1,6 @@
 import spacy, re, openai, random
 from dotenv import dotenv_values
+from spacy_download import load_spacy
 
 # load the api key for gpt3
 config = dotenv_values(".env")
@@ -147,7 +148,7 @@ def generate_prompts(nounSet,verbSet):
 # function to call from outside
 def get_prompts(raw_tweet):
     # load spacy pos tagger
-    nlp = spacy.load("en_core_web_sm")
+    nlp = load_spacy("en_core_web_sm")
 
     # preprocess raw_tweet
     tweet, _ = tweet_process(raw_tweet)
