@@ -6,8 +6,8 @@ import json
 from dotenv import load_dotenv
 
 load_dotenv(".env")
-consumer_key = os.getenv('CONSUMER_KEY')
-consumer_secret = os.getenv('CONSUMER_SECRET')
+consumer_key = os.getenv('TWITTER_CONSUMER_KEY')
+consumer_secret = os.getenv('TWITTER_CONSUMER_SECRET')
 
 # Be sure to add replace the text of the with the text you wish to Tweet. You can also add parameters to post polls, quote Tweets, Tweet with reply settings, and Tweet to Super Followers in addition to other features.
 payload = {"text": "Hello world!"}
