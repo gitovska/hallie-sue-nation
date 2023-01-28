@@ -1,4 +1,3 @@
-import requests
 from requests_oauthlib import OAuth1Session
 import os
 import json
@@ -23,8 +22,8 @@ class TwitterBot:
         )
         try:
             self.__mentions_df = pd.read_json('data/mentions.json')
-        except ValueError:
-            self.__mentions_df = None
+        except ValueError and FileNotFoundError:
+            self.__mentions_df = pd.DataFrame()
 
     def _get_request(self, url, params=None):
         if params:
@@ -68,7 +67,7 @@ class TwitterBot:
 
     def _query_mentions(self, mention_ids):
 
-        if self.__mentions_df:
+        if not self.__mentions_df.empty:
             query_ids = [tweet_id for tweet_id in mention_ids if tweet_id not in self.__mentions_df['id']]
         else:
             query_ids = mention_ids
@@ -76,22 +75,49 @@ class TwitterBot:
         url = "https://api.twitter.com/2/tweets?"
         params = {"ids": ",".join(query_ids),
                   "expansions": "attachments.media_keys",
-                  "media.fields": "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width,alt_text",
+                  "media.fields": "media_key,alt_text,height,width,type,url",
                   }
 
         tweets_response = self._get_request(url, params)
+        tweets_response_json = tweets_response.json()
 
-        return tweets_response.json()
+        new_mentions_df = pd.DataFrame(columns=['id', 'text', 'media_key', 'processed'])
+        for tweet in tweets_response_json['data']:
+            tweet.setdefault('attachments', False)
+            new_tweet = {}
+            new_tweet['id'] = tweet['id']
+            new_tweet['text'] = tweet['text']
+            if tweet['attachments']:
+                new_tweet['media_key'] = tweet['attachments']['media_keys'][0]
+            else:
+                new_tweet['media_key'] = None
+            new_tweet['processed'] = False
+            new_mentions_df.loc[len(new_mentions_df)] = new_tweet.values()
+            new_mentions_df['id'].apply(lambda x: int(x))
 
-    def _write_mentions(self, mentions):
-        pass
+        media_fields = ['media_key', 'height', 'width', 'url', 'type']
+        media_df = pd.DataFrame(columns=media_fields)
+        for tweet in tweets_response_json['includes']['media']:
+            medium = {}
+            for field in media_fields:
+                medium[field] = tweet[field]
+            media_df.loc[len(media_df)] = medium.values()
+
+        media_df['height'].apply(lambda x: int(x))
+        media_df['width'].apply(lambda x: int(x))
+
+        return new_mentions_df.merge(media_df, how='outer', on='media_key')
+
+    def _write_mentions(self, new_mentions):
+        full_mentions = pd.concat([self.__mentions_df, new_mentions], axis=0)
+        full_mentions.reset_index(drop=True, inplace=True)
+        full_mentions.to_json('data/mentions.json')
 
     def mentions(self, username):
         user_id = self._get_user_id(username)
         mention_ids = self._get_mention_ids(user_id)
-        mentions = self._query_mentions(mention_ids)
-        self._write_mentions(mentions)
-        print(json.dumps(mentions))
+        new_mentions = self._query_mentions(mention_ids)
+        full_mentions = self._write_mentions(new_mentions)
 
     def tweet(self, tweet_string, image=None):
         if image:
@@ -99,7 +125,3 @@ class TwitterBot:
         else:
             tweet = {"text": tweet_string}
         self._post_request(tweet)
-
-
-bot = TwitterBot()
-bot.mentions("HallieSueNation")

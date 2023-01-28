@@ -1,4 +1,4 @@
 # ignore .env to prevent pushing API key
 .env
 .idea
-.vercel
+mentions.json
