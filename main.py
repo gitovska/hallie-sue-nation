@@ -19,7 +19,7 @@ import os
 def get_next_tweet(df: pd.DataFrame) -> pd.DataFrame:
     unprocessed_tweets = df.where((df['processed'] == False) & (~df['media_key'].isnull()))
     unprocessed_tweets.sort_values(by=['created_at'], inplace=True)
-    if unprocessed_tweets.empty()
+    if unprocessed_tweets.empty():
         return False
     else:
         return unprocessed_tweets.head(1)
