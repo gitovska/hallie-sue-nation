@@ -43,7 +43,7 @@ class Dreamer:
         init_image = self._get_image(image_url)
         prompt_ids, processed_image = self.pipeline.prepare_inputs(prompt=prompts,
                                                                      image=[init_image] * self.__device_count)
-        p_params = replicate(self.__params)
+        p_params = replicate(self.params)
         prompt_ids = shard(prompt_ids)
         processed_image = shard(processed_image)
 
