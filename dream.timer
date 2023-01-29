@@ -1,0 +1,10 @@
+[Unit]
+Description=starts dream.service after it has been inactive for 10 minutes
+Requires=jrnl.service
+
+[Timer]
+Unit=jrnl.service
+OnUnitInactiveSec=10m
+
+[Install]
+WantedBy=timers.target

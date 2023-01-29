@@ -1,0 +1,8 @@
+[Unit]
+Description="dream"
+Wants=dream.timer
+
+[Service]
+User=wombat
+Group=wombat
+ExecStart=python3.10 /home/wombat/hallie-sue-nation/main.py

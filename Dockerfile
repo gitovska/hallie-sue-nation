@@ -25,5 +25,11 @@ RUN apt install git -y \
     && python3.10 -m nltk.downloader punkt \
     && pip3.10 install "jax[tpu]>=0.2.16" -f https://storage.googleapis.com/jax-releases/libtpu_releases.html
 
+RUN cd hallie-sue-nation \
+    && mv dream.service /etc/systemd/system/dream.service \
+    && mv dream.timer /etc/systemd/system/dream.timer \
+    && systemctl daemon-reload \
+    && systemctl enable dream.timer \
+
 # Clean up APT when done
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
