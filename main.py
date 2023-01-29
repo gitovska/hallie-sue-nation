@@ -31,7 +31,7 @@ if __name__ == "__main__":
     bot = TwitterBot()
     bot_name = "HallieSueNation"
     print(f"Getting mentions for {bot_name}")
-    bot.mentions(botname)
+    bot.mentions(bot_name)
 
     # get next unprocessed tweet
     df = pd.read_json('data/mentions.json')
