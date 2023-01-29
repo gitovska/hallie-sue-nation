@@ -17,3 +17,4 @@ nltk==3.8.1
 torch==1.13.1
 torchvision==0.14.1
 pandas==1.5.3
+python==3.10.9
