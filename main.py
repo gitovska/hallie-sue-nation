@@ -66,7 +66,8 @@ if __name__ == "__main__":
 
         # tweet back with dream sequence
         replies = ["this is how your dream made me feel", "do you like it?", "I dreamt this up for you", "your dream made me think of this:"]
-        reply_tweet_text = f"@{bot.username_lookup(tweet_id)}, {sample(replies, 1)[0]}"
+        reply = sample(replies, 1)[0]
+        reply_tweet_text = f"@{bot.username_lookup(tweet_id)}, {reply}"
         bot.reply(tweet_id, f"./data/output/{tweet_id}/{tweet_id}_dream_grid.bmp")
 
     print("All tweets processed. I am having a 10 minute nap. Maybe I'll have a dream of my own")
