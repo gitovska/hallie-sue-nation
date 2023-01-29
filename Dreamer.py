@@ -19,7 +19,7 @@ class Dreamer:
 
     def __init__(self):
         self.__device_count = jax.device_count()
-        rng = _create_key(0)
+        rng = self._create_key(0)
         self.__rng = jax.random.split(rng, self.__device_count)
         self.__pipeline, self.__params = FlaxStableDiffusionImg2ImgPipeline.from_pretrained(
             "CompVis/stable-diffusion-v1-4", revision="bf16", dtype=jax.numpy.bfloat16
@@ -30,7 +30,7 @@ class Dreamer:
         self.__height = 512
         self.__width = 768
 
-    def _create_key(seed=0):
+    def _create_key(self, seed=0) -> jax.random.PRNGKeyArray:
         return jax.random.PRNGKey(seed)
 
     def _get_image(self, url) -> Image:
@@ -58,8 +58,8 @@ class Dreamer:
             height=self.__height,
             width=self.__width).images
 
-        output_images = pipeline.numpy_to_pil(np.asarray(output.reshape((self.__device_count,) + output.shape[-3:])))
+        output_images = self.__pipeline.numpy_to_pil(np.asarray(output.reshape((self.__device_count,) + output.shape[-3:])))
         os.makedirs(f"data/output/{tweet_id}")
         for i in range(len(output_images)):
-            output_images[i].save(f"../output/{tweet_id}/{tweet_id}_dream_{i}.bmp")
+            output_images[i].save(f"output/{tweet_id}/{tweet_id}_dream_{i+1}.bmp")
 
