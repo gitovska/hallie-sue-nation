@@ -1,9 +1,10 @@
 import requests
 from requests_oauthlib import OAuth1Session
 import os
-import json
+import json, base64
 from dotenv import load_dotenv
 import pandas as pd
+from io import BytesIO
 
 
 # The base code of this twitter bot is a refactoring of twitterdev code from the following sources:
@@ -120,6 +121,38 @@ class TwitterBot:
             os.makedirs('data')
         full_mentions.to_json('data/mentions.json')
 
+    def _upload_image(self, image:str) -> str:
+        """
+
+        :param image: path to the image
+        :return: media_id as string
+        this function retrieves the id of the images, which is needed for upload image later
+        """
+        url = "https://upload.twitter.com/1.1/media/upload.json"
+        files = {"media": open(image, 'rb')}
+
+        response = self.__oauth.post(url, files=files)
+
+        if response.status_code in [200, 201]:
+            media_id = json.loads(response.text)['media_id']
+            return media_id
+        else:
+            return False
+
+    def _username_lookup(self,tweet_id):
+        tweet_id = str(tweet_id)
+        url = f'https://api.twitter.com/2/tweets?ids={tweet_id}'
+
+        params = {"expansions": "author_id"}
+        response = self.__oauth.get(url,params=params)
+        if response.status_code in [200, 201]:
+            username = json.loads(response.text)
+            return username["includes"]["users"][0]["username"]
+        else:
+            print("something went wrong at getting username")
+            print(response.status_code)
+            return False
+
 
     # Public Class Methods
 
@@ -135,3 +168,40 @@ class TwitterBot:
         else:
             tweet = {"text": tweet_string}
         self._post_request(tweet)
+
+    def reply(self, tweet_id: str, image:str):
+        """
+
+        :param tweet_id: the tweet_id as str
+        :param image: the path to the image
+        :return:
+        """
+        username = self._username_lookup(tweet_id)
+        media_id = self._upload_image(image)
+        params = {'status': f"heyy, thanks for your dream! Here are some of the arts."
+                            f" I hope you'll like them:) @{username}",
+                  'media_ids': [media_id],
+                  "in_reply_to_status_id": tweet_id}
+        print(params)
+        url = "https://api.twitter.com/1.1/statuses/update.json"
+        post_object = self.__oauth.post(url, params=params)
+
+        if post_object.status_code in [200, 201]:
+            print("Tweet was successfully posted")
+        else:
+            print("Something went wrong")
+            print(post_object.status_code)
+
+
+
+
+
+
+
+TB=TwitterBot()
+image = r"/Users/sunzihang/development/CC/style_transfer/result_surrealism2.png"
+# with open(image, "rb") as binary_file:
+#     binary_data = binary_file.read()
+tweet_id = 1619129058943713280
+#TB.reply(tweet_id,image)
+x = TB.reply(tweet_id,image)
