@@ -63,9 +63,9 @@ if __name__ == "__main__":
         # tweet back with dream sequence
 
         load_dotenv(".env")
-        subprocess.run()
-        shlex.split(f"scp -P {os.getenv('PORT')} ./data/output/{next_tweet_id}/{next_tweet_id}_dream_grid.bmp"
+        scp = shlex.split(f"scp -P {os.getenv('PORT')} ./data/output/{next_tweet_id}/{next_tweet_id}_dream_grid.bmp"
                     f" {os.getenv('USER')}@{os.getenv('DOMAIN')}:docker-nginx/html/")
+        subprocess.run(scp)
         bot.post(f"@{bot.username_lookup(next_tweet_id)}, you dream sequence is at "
                  f"halliesuenation.ad.rienne.de/{next_tweet_id}_dream_grid.bmp")
     else:
