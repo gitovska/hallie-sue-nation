@@ -22,7 +22,8 @@ RUN apt install git -y \
     && git clone https://github.com/gitovska/hallie-sue-nation.git \
     && cd hallie-sue-nation \
     && pip3.10 install -r requirements.txt \
-    && python3.10 -m nltk.downloader punkt
+    && python3.10 -m nltk.downloader punkt \
+    && pip3.10 install "jax[tpu]>=0.2.16" -f https://storage.googleapis.com/jax-releases/libtpu_releases.html
 
 # Clean up APT when done
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
