@@ -54,8 +54,8 @@ if __name__ == "__main__":
         print(f"Dreaming with tweet: '{tweet_text}' and the following prompts:")
         for prompt in tweet_prompts:
             print(f"\t{prompt}")
-        #dreamer = Dreamer()
-        #dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
+        dreamer = Dreamer()
+        dreamer.dream(tweet_prompts, tweet_id, tweet_url)
 
         # mark tweet as processed
         print(f"Marking tweet {tweet_id} as processed")
