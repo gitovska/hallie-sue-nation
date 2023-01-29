@@ -16,7 +16,8 @@ import pandas as pd
 import os
 import subprocess, shlex
 from dotenv import load_dotenv
-
+import paramiko
+from scp import SCPClient
 
 def get_next_tweet(df: pd.DataFrame) -> pd.DataFrame:
     unprocessed_tweets = df.where((df['processed'] == False) & (~df['media_key'].isnull()))
@@ -26,6 +27,13 @@ def get_next_tweet(df: pd.DataFrame) -> pd.DataFrame:
 def get_prompts(tweet: str) -> list[str]:
     prep = Preprocessor()
     return prep.get_prompts(tweet)
+
+def createSSHClient(hostname, port, username, key_filename):
+    client = paramiko.SSHClient()
+    client.load_system_host_keys()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(hostname=hostname, port=port, username=username, key_filename=key_filename)
+    return client
 
 
 if __name__ == "__main__":
@@ -63,10 +71,10 @@ if __name__ == "__main__":
         # tweet back with dream sequence
 
         load_dotenv(".env")
-        scp = shlex.split(f"scp -P {os.getenv('PORT')} ./data/output/{next_tweet_id}/{next_tweet_id}_dream_grid.bmp"
-                    f" {os.getenv('USER')}@{os.getenv('DOMAIN')}:docker-nginx/html/")
-        subprocess.run(scp)
-        bot.post(f"@{bot.username_lookup(next_tweet_id)}, you dream sequence is at "
-                 f"halliesuenation.ad.rienne.de/{next_tweet_id}_dream_grid.bmp")
+        ssh = createSSHClient(hostname=os.getenv('DOMAIN'), port=os.getenv('PORT'), username=os.getenv('USER'), key_filename='/home/wombat/.ssh/id_rsa')
+        scp = SCPClient(ssh.get_transport())
+        scp.put('./data/output/{next_tweet_id}/{next_tweet_id}_dream_grid.bmp', remote_path='docker-nginx/html/')
+
+        #bot.tweet(f"@User, you dream sequence is at halliesuenation.ad.rienne.de/{next_tweet_id}_dream_grid.bmp")
     else:
         print("All tweets processed")
