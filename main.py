@@ -19,7 +19,10 @@ import os
 def get_next_tweet(df: pd.DataFrame) -> pd.DataFrame:
     unprocessed_tweets = df.where((df['processed'] == False) & (~df['media_key'].isnull()))
     unprocessed_tweets.sort_values(by=['created_at'], inplace=True)
-    return unprocessed_tweets.head(1)
+    if unprocessed_tweets.empty()
+        return False
+    else:
+        return unprocessed_tweets.head(1)
 
 def get_prompts(tweet: str) -> list[str]:
     prep = Preprocessor()
@@ -37,23 +40,27 @@ if __name__ == "__main__":
     # get next unprocessed tweet
     df = pd.read_json('data/mentions.json')
     next_tweet = get_next_tweet(df)
-    next_tweet_text = next_tweet['text'].values[0]
-    next_tweet_prompts = get_prompts(next_tweet_text)
-    next_tweet_url = next_tweet['url'].values[0]
-    next_tweet_id = (int(next_tweet['id'].values[0]))
+    if next_tweet:
+        next_tweet_text = next_tweet['text'].values[0]
+        next_tweet_prompts = get_prompts(next_tweet_text)
+        next_tweet_url = next_tweet['url'].values[0]
+        next_tweet_id = (int(next_tweet['id'].values[0]))
 
-    # dream
-    print(f"Dreaming with tweet: '{next_tweet_text}' and the following prompts:")
-    for prompt in next_tweet_prompts:
-        print(f"\t{prompt}")
-    dreamer = Dreamer()
-    dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
+        # dream
+        print(f"Dreaming with tweet: '{next_tweet_text}' and the following prompts:")
+        for prompt in next_tweet_prompts:
+            print(f"\t{prompt}")
+        dreamer = Dreamer()
+        dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
 
-    # mark tweet as processed
-    print(f"Marking tweet {next_tweet_id} as processed")
-    df.loc[next_tweet['id'].index, 'processed'] = True
-    os.remove('data/mentions.json')
-    df.to_json('data/mentions.json')
+        # mark tweet as processed
+        print(f"Marking tweet {next_tweet_id} as processed")
+        df.loc[next_tweet['id'].index, 'processed'] = True
+        os.remove('data/mentions.json')
+        df.to_json('data/mentions.json')
 
-    # tweet back with dream sequence
-    # bot.reply(next_tweet_id, image)
+        # tweet back with dream sequence
+        # bot.reply(next_tweet_id, image)
+
+    else:
+        print("All tweets processed")
