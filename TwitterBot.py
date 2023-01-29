@@ -210,13 +210,6 @@ class TwitterBot:
             print(response)
 
 
-
-oauth2client = OAuth2Client(
-    token_endpoint="https://myas.local/token_endpoint",
-    auth=("client_id", "client_secret"),
-)
-
-
 bot = TwitterBot()
 image = r"/home/wombat/daisy_dolphin_200_steps_s5_form.png"
 with open(image, "rb") as binary_file:
