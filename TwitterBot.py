@@ -142,22 +142,9 @@ class TwitterBot:
         else:
             return False
 
-    def _username_lookup(self,tweet_id):
-        tweet_id = str(tweet_id)
-        url = f'https://api.twitter.com/2/tweets?ids={tweet_id}'
-
-        params = {"expansions": "author_id"}
-        response = self.__oauth.get(url, params=params)
-        if response.status_code in [200, 201]:
-            username = json.loads(response.text)
-            return username["includes"]["users"][0]["username"]
-        else:
-            print("Failed to get username")
-            print(response.status_code)
-            return False
-
 
     # Public Class Methods
+
 
     def mentions(self, username: str):
         user_id = self._get_user_id(username)
@@ -171,6 +158,20 @@ class TwitterBot:
         else:
             tweet = {"text": tweet_string}
         self._post_request(tweet)
+
+    def username_lookup(self, tweet_id):
+        tweet_id = str(tweet_id)
+        url = f'https://api.twitter.com/2/tweets?ids={tweet_id}'
+
+        params = {"expansions": "author_id"}
+        response = self.__oauth.get(url, params=params)
+        if response.status_code in [200, 201]:
+            username = json.loads(response.text)
+            return username["includes"]["users"][0]["username"]
+        else:
+            print("Failed to get username")
+            print(response.status_code)
+            return False
 
     def refresh(self):
         refresh_url = 'https://api.twitter.com/2/oauth2/token'
@@ -192,7 +193,7 @@ class TwitterBot:
 
 
 
-        username = self._username_lookup(tweet_id)
+        username = self.username_lookup(tweet_id)
         media_id = self._upload_image(image)
         params = {'text': f"@{username} This is how your dream makes me feel.",
                   'media': {"media_ids": [str(media_id)]},

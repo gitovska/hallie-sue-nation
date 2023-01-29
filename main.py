@@ -14,6 +14,8 @@ from Preprocessor import Preprocessor
 from Dreamer import Dreamer
 import pandas as pd
 import os
+import subprocess, shlex
+from dotenv import load_dotenv
 
 
 def get_next_tweet(df: pd.DataFrame) -> pd.DataFrame:
@@ -59,7 +61,12 @@ if __name__ == "__main__":
         df.to_json('data/mentions.json')
 
         # tweet back with dream sequence
-        # bot.reply(next_tweet_id, image)
 
+        load_dotenv(".env")
+        subprocess.run()
+        shlex.split(f"scp -P {os.getenv('PORT')} ./data/output/{next_tweet_id}/{next_tweet_id}_dream_grid.bmp"
+                    f" {os.getenv('USER')}@{os.getenv('DOMAIN')}:docker-nginx/html/")
+        bot.post(f"@{bot.username_lookup(next_tweet_id)}, you dream sequence is at "
+                 f"halliesuenation.ad.rienne.de/{next_tweet_id}_dream_grid.bmp")
     else:
         print("All tweets processed")
