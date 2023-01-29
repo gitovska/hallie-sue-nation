@@ -14,6 +14,7 @@ from Preprocessor import Preprocessor
 from Dreamer import Dreamer
 import pandas as pd
 import os
+from io import StringIO
 import subprocess, shlex
 from dotenv import load_dotenv
 import paramiko
@@ -28,11 +29,13 @@ def get_prompts(tweet: str) -> list[str]:
     prep = Preprocessor()
     return prep.get_prompts(tweet)
 
-def createSSHClient(hostname, port, username, key_filename):
+def createSSHClient(hostname, port, username):
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(hostname=hostname, port=port, username=username, key_filename=key_filename)
+    private_key = StringIO('/home/wombat/.ssh/id_rsa')
+    mykey = paramiko.RSAKey.from_private_key(private_key)
+    client.connect(hostname=hostname, port=port, username=username)
     return client
 
 
@@ -71,7 +74,7 @@ if __name__ == "__main__":
         # tweet back with dream sequence
 
         load_dotenv(".env")
-        ssh = createSSHClient(hostname=os.getenv('DOMAIN'), port=os.getenv('PORT'), username=os.getenv('USER'), key_filename='/home/wombat/.ssh/id_rsa')
+        ssh = createSSHClient(hostname=os.getenv('DOMAIN'), port=os.getenv('PORT'), username=os.getenv('USER'))
         scp = SCPClient(ssh.get_transport())
         scp.put('./data/output/{next_tweet_id}/{next_tweet_id}_dream_grid.bmp', remote_path='docker-nginx/html/')
 
