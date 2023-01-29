@@ -5,6 +5,7 @@ import json, base64
 from dotenv import load_dotenv
 import pandas as pd
 
+
 # The base code of this twitter bot is a refactoring of twitterdev code from the following sources:
     # github.com/twitterdev/Twitter-API-v2-sample-code
         # Tweet-Lookup/get_tweets_with_bearer_token.py
@@ -116,12 +117,9 @@ class TwitterBot:
         return new_mentions_df.merge(media_df, how='outer', on='media_key')
 
     def _write_mentions(self, new_mentions: pd.DataFrame):
-        full_mentions = pd.concat([self.__mentions_df, new_mentions], axis=0)
-        full_mentions.reset_index(drop=True, inplace=True)
         if not os.path.isdir('data'):
             os.makedirs('data')
-        os.remove('data/mentions.json')
-        full_mentions.to_json('data/mentions.json')
+        new_mentions.to_json('data/mentions.json')
 
     def _upload_image(self, image:str) -> str:
         """
@@ -146,12 +144,12 @@ class TwitterBot:
         url = f'https://api.twitter.com/2/tweets?ids={tweet_id}'
 
         params = {"expansions": "author_id"}
-        response = self.__oauth.get(url, params=params)
+        response = self.__oauth.get(url,params=params)
         if response.status_code in [200, 201]:
             username = json.loads(response.text)
             return username["includes"]["users"][0]["username"]
         else:
-            print("Failed to get username")
+            print("something went wrong at getting username")
             print(response.status_code)
             return False
 
@@ -171,16 +169,6 @@ class TwitterBot:
             tweet = {"text": tweet_string}
         self._post_request(tweet)
 
-    def refresh(self):
-        refresh_url = 'https://api.twitter.com/2/oauth2/token'
-        headers={'Content-Type': 'application/x-www-form-urlencoded'}
-        params={"refresh_token": os.getenv('TWITTER_ACCESS_TOKEN'),
-                "grant_type": "refresh_token",
-                "client_id": os.getenv('TWITTER_CONSUMER_KEY')}
-
-        response = requests.post(url=refresh_url, headers=headers, params=params)
-        print("refreshing")
-        print(response)
     def reply(self, tweet_id: str, image:str):
         """
 
@@ -188,22 +176,26 @@ class TwitterBot:
         :param image: the path to the image
         :return:
         """
-
-
-
         username = self._username_lookup(tweet_id)
         media_id = self._upload_image(image)
-        params = {'text': f"@{username} This is how your dream makes me feel.",
-                  'media': {"media_ids": [str(media_id)]},
-                  "reply": {"in_reply_to_tweet_id": str(tweet_id)}}
+        params = {'status': f"heyy, thanks for your dream! Here are some of the arts."
+                            f" I hope you'll like them:) @{username}",
+                  'media_ids': [media_id],
+                  "in_reply_to_status_id": tweet_id}
         print(params)
-        url = "https://api.twitter.com/2/tweets"
-        response = self.__oauth.post(url, params=params)
+        url = "https://api.twitter.com/1.1/statuses/update.json"
+        post_object = self.__oauth.post(url, params=params)
 
-        if response.status_code in [200, 201]:
+        if post_object.status_code in [200, 201]:
             print("Tweet was successfully posted")
         else:
             print("Something went wrong")
-            print(response.status_code)
-            print(response)
+            print(post_object.status_code)
 
+
+# TB=TwitterBot()
+# image = r"/Users/sunzihang/development/CC/style_transfer/result_surrealism2.png"
+# # with open(image, "rb") as binary_file:
+# #     binary_data = binary_file.read()
+# tweet_id = 1619129058943713280
+# #TB.reply(tweet_id,image)
