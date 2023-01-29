@@ -3,6 +3,7 @@ import numpy as np
 from flax.jax_utils import replicate
 from flax.training.common_utils import shard
 import requests
+import os
 from io import BytesIO
 from PIL import Image
 from diffusers import FlaxStableDiffusionImg2ImgPipeline
@@ -61,5 +62,5 @@ class Dreamer:
         output_images = self.__pipeline.numpy_to_pil(np.asarray(output.reshape((self.__device_count,) + output.shape[-3:])))
         os.makedirs(f"data/output/{tweet_id}")
         for i in range(len(output_images)):
-            output_images[i].save(f"output/{tweet_id}/{tweet_id}_dream_{i+1}.bmp")
+            output_images[i].save(f"./data/output/{tweet_id}/{tweet_id}_dream_{i+1}.bmp")
 
