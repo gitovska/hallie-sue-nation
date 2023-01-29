@@ -47,7 +47,7 @@ class Dreamer:
         prompt_ids = shard(prompt_ids)
         processed_image = shard(processed_image)
 
-        output = pipeline(
+        output = self.__pipeline(
             prompt_ids=prompt_ids,
             image=processed_image,
             params=p_params,
