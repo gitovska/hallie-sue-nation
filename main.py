@@ -17,6 +17,7 @@ import os
 import subprocess, shlex
 from dotenv import load_dotenv
 import datetime
+from random import sample
 
 
 def get_unprocessed_tweets(df: pd.DataFrame) -> pd.DataFrame:
@@ -64,23 +65,8 @@ if __name__ == "__main__":
         df.to_json('data/mentions.json')
 
         # tweet back with dream sequence
-        # Note: multiple methods have been attempted to tweet back the dream sequence to the user.
-        # Attempt: tweet reply. Issue: Twitter refuses our requests with 403 forbidden error.
-        # Attempt: sending the dream sequence to a privately hosted webserver running NGINX in a docker container,
-        # and providing a link to the image in the tweet. Issue: A connection can be established between the two servers,
-        # and the files transferred manually, but this fails within a script, be it here in main, a shell script, or server side
-        # sync tools like lsync.
-
-        # ssh syncing of dreams to webserver
-
-        # load_dotenv(".env")
-        # dream_transfer = shlex.split(
-        #     f"./dream-transfer.sh {os.getenv('PORT')} {os.getenv('USER')} {os.getenv('DOMAIN')}")
-        # result = subprocess.run(dream_transfer, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        # print(result.stdout)
-        # print(result.stderr)
-
-        # bot.tweet(f"@{bot.username_lookup(next_tweet_id)}, you dream sequence is at halliesuenation.ad.rienne.de/{next_tweet_id}_dream_grid.bmp")
-        print(f"Tweet: @{bot.username_lookup(tweet_id)}, look at your dream")
+        replies = ["this is how your dream made me feel", "do you like it?", "I dreamt this up for you", "your dream made me think of this:"]
+        reply_tweet_text = f"@{bot.username_lookup(tweet_id)}, {replies.sample()}"
+        bot.reply(tweet_id, f"./data/output/{tweet_id}/{tweet_id}_dream_grid.bmp")
 
     print("All tweets processed. I am having a 10 minute nap. Maybe I'll have a dream of my own")
