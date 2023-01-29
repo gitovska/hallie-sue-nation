@@ -1,5 +1,6 @@
 import jax
 import numpy as np
+import os
 from flax.jax_utils import replicate
 from flax.training.common_utils import shard
 import requests
