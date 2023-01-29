@@ -16,12 +16,14 @@ import pandas as pd
 import os
 import subprocess, shlex
 from dotenv import load_dotenv
+import datetime
 
 
-def get_next_tweet(df: pd.DataFrame) -> pd.DataFrame:
+def get_unprocessed_tweets(df: pd.DataFrame) -> pd.DataFrame:
     unprocessed_tweets = df.where((df['processed'] == False) & (~df['media_key'].isnull()))
+    unprocessed_tweets.dropna(inplace=True)
     unprocessed_tweets.sort_values(by=['created_at'], inplace=True)
-    return unprocessed_tweets.head(1)
+    return unprocessed_tweets
 
 
 def get_prompts(tweet: str) -> list[str]:
@@ -38,26 +40,26 @@ if __name__ == "__main__":
     bot.mentions(bot_name)
 
     # get next unprocessed tweet
-    df = pd.read_json('data/mentions.json')
-    next_tweet = get_next_tweet(df)
-    if len(next_tweet.index) != 0:
-        print(next_tweet)
-        print(len(next_tweet.index))
-        next_tweet_text = next_tweet['text'].values[0]
-        next_tweet_prompts = get_prompts(next_tweet_text)
-        next_tweet_url = next_tweet['url'].values[0]
-        next_tweet_id = (int(next_tweet['id'].values[0]))
+    df = pd.read_json('data/mentions.json',
+                      dtype={"id": str, "text": str, "media_key": str, "created_at": datetime,
+                             "height": int, "width": int, "url": str, "type": str})
+    unprocessed_tweets = get_unprocessed_tweets(df)
+    for _, tweet in unprocessed_tweets.iterrows():
+        tweet_text = tweet['text']
+        tweet_prompts = get_prompts(tweet_text)
+        tweet_url = tweet['url']
+        tweet_id = tweet['id']
 
         # dream
-        print(f"Dreaming with tweet: '{next_tweet_text}' and the following prompts:")
-        for prompt in next_tweet_prompts:
+        print(f"Dreaming with tweet: '{tweet_text}' and the following prompts:")
+        for prompt in tweet_prompts:
             print(f"\t{prompt}")
-        dreamer = Dreamer()
-        dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
+        #dreamer = Dreamer()
+        #dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
 
         # mark tweet as processed
-        print(f"Marking tweet {next_tweet_id} as processed")
-        df.loc[next_tweet['id'].index, 'processed'] = True
+        print(f"Marking tweet {tweet_id} as processed")
+        df.loc[df['id'] == tweet['id'], 'processed'] = True
         os.remove('data/mentions.json')
         df.to_json('data/mentions.json')
 
@@ -79,6 +81,6 @@ if __name__ == "__main__":
         # print(result.stderr)
 
         # bot.tweet(f"@{bot.username_lookup(next_tweet_id)}, you dream sequence is at halliesuenation.ad.rienne.de/{next_tweet_id}_dream_grid.bmp")
+        print(f"Tweet: @{bot.username_lookup(tweet_id)}, look at your dream")
 
-    else:
-        print("All tweets processed")
+    print("All tweets processed. I am having a 10 minute nap. Maybe I'll have a dream of my own")
