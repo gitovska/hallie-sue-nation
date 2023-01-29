@@ -3,6 +3,7 @@ Description="dream"
 Wants=dream.timer
 
 [Service]
+Type=simple
 User=wombat
 Group=wombat
-ExecStart=python3.10 /home/wombat/hallie-sue-nation/main.py
+ExecStart=/usr/local/bin/python3.10 /home/wombat/hallie-sue-nation/main.py
