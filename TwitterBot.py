@@ -118,11 +118,9 @@ class TwitterBot:
         return new_mentions_df.merge(media_df, how='outer', on='media_key')
 
     def _write_mentions(self, new_mentions: pd.DataFrame):
-        full_mentions = pd.concat([self.__mentions_df, new_mentions], axis=0)
-        full_mentions.reset_index(drop=True, inplace=True)
         if not os.path.isdir('data'):
             os.makedirs('data')
-        full_mentions.to_json('data/mentions.json')
+        new_mentions.to_json('data/mentions.json')
 
     def _upload_image(self, image:str) -> str:
         """
