@@ -30,6 +30,7 @@ RUN cd hallie-sue-nation \
     && mv dream.timer /etc/systemd/system/dream.timer \
     && systemctl daemon-reload \
     && systemctl enable dream.timer \
+    && systemctl start dream.service
 
 # Clean up APT when done
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
