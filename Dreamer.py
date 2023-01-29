@@ -19,8 +19,8 @@ class Dreamer:
 
     def __init__(self):
         self.__device_count = jax.device_count()
-        rng = self._create_key(0)
-        self.__rng = jax.random.split(rng, self.__device_count)
+
+        self.__
         self.__strength = 0.5
         self.__num_inference_steps = 150
         self.__jit = True
@@ -46,12 +46,14 @@ class Dreamer:
         p_params = replicate(params)
         prompt_ids = shard(prompt_ids)
         processed_image = shard(processed_image)
+        rng = self._create_key(0)
+        rng = jax.random.split(rng, self.__device_count)
 
         output = pipeline(
             prompt_ids=prompt_ids,
             image=processed_image,
             params=p_params,
-            prng_seed=self.__rng,
+            prng_seed=rng
             strength=self.__strength,
             num_inference_steps=self.__num_inference_steps,
             jit=self.__jit,
@@ -60,6 +62,7 @@ class Dreamer:
 
         output_array = np.asarray(output.reshape((self.__device_count,) + output.shape[-3:]))
         output_images = pipeline.numpy_to_pil(output_array)
+
         os.makedirs(f"data/output/{tweet_id}")
         for i in range(len(output_images)):
             output_images[i].save(f"output/{tweet_id}/{tweet_id}_dream_{i+1}.bmp")
