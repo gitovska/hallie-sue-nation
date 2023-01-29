@@ -19,8 +19,6 @@ class Dreamer:
 
     def __init__(self):
         self.__device_count = jax.device_count()
-
-        self.__
         self.__strength = 0.5
         self.__num_inference_steps = 150
         self.__jit = True
