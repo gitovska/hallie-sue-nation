@@ -170,7 +170,6 @@ class TwitterBot:
             tweet = {"text": tweet_string}
         else:
             tweet = {"text": tweet_string}
-<<<<<<< HEAD
         self._post_request(tweet)
 
     def reply(self, tweet_id: str, image:str):
@@ -197,18 +196,9 @@ class TwitterBot:
             print(post_object.status_code)
 
 
-
-
-
-
-
-TB=TwitterBot()
-image = r"/Users/sunzihang/development/CC/style_transfer/result_surrealism2.png"
-# with open(image, "rb") as binary_file:
-#     binary_data = binary_file.read()
-tweet_id = 1619129058943713280
-#TB.reply(tweet_id,image)
-x = TB.reply(tweet_id,image)
-=======
-        self._post_request(tweet)
->>>>>>> 29791a72b4148c8e813131a85dfadd8212b69b14
+# TB=TwitterBot()
+# image = r"/Users/sunzihang/development/CC/style_transfer/result_surrealism2.png"
+# # with open(image, "rb") as binary_file:
+# #     binary_data = binary_file.read()
+# tweet_id = 1619129058943713280
+# #TB.reply(tweet_id,image)
