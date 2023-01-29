@@ -50,26 +50,26 @@ if __name__ == "__main__":
 
         # dream
         print(f"Dreaming with tweet: '{next_tweet_text}' and the following prompts:")
-        # for prompt in next_tweet_prompts:
-        # print(f"\t{prompt}")
-        # dreamer = Dreamer()
-        # dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
+        for prompt in next_tweet_prompts:
+            print(f"\t{prompt}")
+        dreamer = Dreamer()
+        dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
 
         # mark tweet as processed
-        print(f"Marking tweet {next_tweet_id} as processed")
-        df.loc[next_tweet['id'].index, 'processed'] = True
-        os.remove('data/mentions.json')
-        df.to_json('data/mentions.json')
+       print(f"Marking tweet {next_tweet_id} as processed")
+       df.loc[next_tweet['id'].index, 'processed'] = True
+       os.remove('data/mentions.json')
+       df.to_json('data/mentions.json')
 
         # tweet back with dream sequence
 
-        load_dotenv(".env")
-        dream_transfer = shlex.split(
-            f"./dream-transfer.sh {os.getenv('PORT')} {os.getenv('USER')} {os.getenv('DOMAIN')}")
-        result = subprocess.run(dream_transfer, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        print(result.stdout)
-        print(result.stderr))
+       load_dotenv(".env")
+       dream_transfer = shlex.split(
+           f"./dream-transfer.sh {os.getenv('PORT')} {os.getenv('USER')} {os.getenv('DOMAIN')}")
+       result = subprocess.run(dream_transfer, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+       print(result.stdout)
+       print(result.stderr))
 
-        # bot.tweet(f"@User, you dream sequence is at halliesuenation.ad.rienne.de/{next_tweet_id}_dream_grid.bmp")
-        else:
+       bot.tweet(f"@{bot.username_lookup(next_tweet_id)}, you dream sequence is at halliesuenation.ad.rienne.de/{next_tweet_id}_dream_grid.bmp")
+    else:
         print("All tweets processed")
