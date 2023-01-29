@@ -4,6 +4,10 @@ from nltk import sent_tokenize
 from random import sample
 
 class Preprocessor():
+    """
+    A class to turn a tweet into eight prompts that can be fed to a TPU to produce eight different generated
+    images from the same image simultaneously.
+    """
     def __init__(self):
         self.__config = dotenv_values(".env")
         # load the api key for gpt3

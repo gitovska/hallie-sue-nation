@@ -1,23 +1,20 @@
-"""
-1. Check for new mentions.
-2. Write mentions to json.
-3. Send unprocessed tweets to Prompt Generator.
-4. Send first unprocessed tweet to Dreamer.
-5. Send generated images to Style Transferer.
-6. Tweet images.
-7. Mark tweet as processed.
-Repeat
-"""
-
 from TwitterBot import TwitterBot
 from Preprocessor import Preprocessor
 from Dreamer import Dreamer
 import pandas as pd
 import os
-import subprocess, shlex
-from dotenv import load_dotenv
 import datetime
 from random import sample
+
+
+# The main of Hallie-Sue does the following:
+#
+# 1. Check Hallie-Sue's Twitter for new mentions.
+# 2. For each unprocessed tweet:
+#      - Send the text of unprocessed tweet to the Preprocessor.
+#      - Send the image and eight prompts of each tweet to Dreamer.
+#      - Tweet dream sequence grid.
+#      - Mark tweet as processed and update mentions.json
 
 
 def get_unprocessed_tweets(df: pd.DataFrame) -> pd.DataFrame:

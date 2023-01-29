@@ -15,7 +15,10 @@ import datetime
 # Manage-Tweets/create_tweet.py
 
 class TwitterBot:
-
+    """
+    A Twitter Bot that can get a user's new mentions, save them to a json,
+    and reply to the mentions with an image and tweet.
+    """
     def __init__(self):
         load_dotenv(".env")
         self.__oauth = OAuth1Session(

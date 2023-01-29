@@ -17,7 +17,10 @@ from diffusers import FlaxStableDiffusionImg2ImgPipeline
 # github.com/huggingface/diffusers
 
 class Dreamer:
-
+    """
+    Produces the dream sequence grid using an input image and a prompt.
+    This model uses a eight cores of a TPU simultaneously with the Stable Diffusion v1-4 Img2Img Pipeline.
+    """
     def __init__(self):
         self.__device_count = jax.device_count()
         rng = self._create_key(0)
