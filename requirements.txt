@@ -17,4 +17,8 @@ nltk==3.8.1
 torch==1.13.1
 torchvision==0.14.1
 pandas==1.5.3
+<<<<<<< HEAD
 spacy-download==1.0.0
+=======
+python==3.10.9
+>>>>>>> 29791a72b4148c8e813131a85dfadd8212b69b14
