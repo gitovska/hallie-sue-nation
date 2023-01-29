@@ -210,10 +210,10 @@ class TwitterBot:
             print(response)
 
 
-bot = TwitterBot()
-image = r"/home/wombat/daisy_dolphin_200_steps_s5_form.png"
-with open(image, "rb") as binary_file:
-  binary_data = binary_file.read()
-tweet_id = 1619129058943713280
-bot.refresh()
-bot.reply(tweet_id, image)
+# bot = TwitterBot()
+# image = r"/home/wombat/daisy_dolphin_200_steps_s5_form.png"
+# with open(image, "rb") as binary_file:
+#   binary_data = binary_file.read()
+# tweet_id = 1619129058943713280
+# bot.refresh()
+# bot.reply(tweet_id, image)
