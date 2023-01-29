@@ -46,7 +46,7 @@ if __name__ == "__main__":
     for prompt in next_tweet_prompts:
         print(f"\t{prompt}")
     dreamer = Dreamer()
-    dreamer.dream(prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
+    dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
 
     # tweet back with dream sequence
     # bot.reply(next_tweet_id, image)
