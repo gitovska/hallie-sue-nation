@@ -11,7 +11,7 @@ Repeat
 
 from TwitterBot import TwitterBot
 from Preprocessor import Preprocessor
-from Dreamer import Dreamer
+from dream import dream
 import pandas as pd
 
 
@@ -45,8 +45,7 @@ if __name__ == "__main__":
     print(f"Dreaming with tweet: '{next_tweet_text}' and the following prompts:")
     for prompt in next_tweet_prompts:
         print(f"\t{prompt}")
-    dreamer = Dreamer()
-    dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
+    dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
 
     # tweet back with dream sequence
     # bot.reply(next_tweet_id, image)
