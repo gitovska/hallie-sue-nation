@@ -70,5 +70,5 @@ class Dreamer:
         for i in range(len(output_images)):
             output_images[i].save(f"./data/output/{tweet_id}/{tweet_id}_dream_{i+1}.bmp")
 
-        grid = image_grid(output_images, 4, 2)
+        grid = self._image_grid(output_images, 4, 2)
         grid.save(f"./data/output/{tweet_id}/{tweet_id}_dream_grid.bmp")
