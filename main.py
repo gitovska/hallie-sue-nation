@@ -13,6 +13,7 @@ from TwitterBot import TwitterBot
 from Preprocessor import Preprocessor
 from Dreamer import Dreamer
 import pandas as pd
+import os
 
 
 def get_next_tweet(df: pd.DataFrame) -> pd.DataFrame:
@@ -37,16 +38,22 @@ if __name__ == "__main__":
     df = pd.read_json('data/mentions.json')
     next_tweet = get_next_tweet(df)
     next_tweet_text = next_tweet['text'].values[0]
-    next_tweet_prompts = get_prompts(next_tweet_text)
+    #next_tweet_prompts = get_prompts(next_tweet_text)
     next_tweet_url = next_tweet['url'].values[0]
     next_tweet_id = (int(next_tweet['id'].values[0]))
 
     # dream
     print(f"Dreaming with tweet: '{next_tweet_text}' and the following prompts:")
-    for prompt in next_tweet_prompts:
-        print(f"\t{prompt}")
-    dreamer = Dreamer()
-    dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
+    #for prompt in next_tweet_prompts:
+    #    print(f"\t{prompt}")
+    #dreamer = Dreamer()
+    #dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
+
+    # mark tweet as processed
+    #print()
+    df.loc[next_tweet['id'].index, 'processed'] = True
+    os.remove('data/mentions.json')
+    df.to_json('data/mentions.json')
 
     # tweet back with dream sequence
     # bot.reply(next_tweet_id, image)
