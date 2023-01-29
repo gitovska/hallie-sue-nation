@@ -44,7 +44,7 @@ if __name__ == "__main__":
         print(next_tweet)
         print(len(next_tweet.index))
         next_tweet_text = next_tweet['text'].values[0]
-        # next_tweet_prompts = get_prompts(next_tweet_text)
+        next_tweet_prompts = get_prompts(next_tweet_text)
         next_tweet_url = next_tweet['url'].values[0]
         next_tweet_id = (int(next_tweet['id'].values[0]))
 
@@ -56,20 +56,29 @@ if __name__ == "__main__":
         dreamer.dream(next_tweet_prompts, tweet_id=next_tweet_id, image_url=next_tweet_url)
 
         # mark tweet as processed
-       print(f"Marking tweet {next_tweet_id} as processed")
-       df.loc[next_tweet['id'].index, 'processed'] = True
-       os.remove('data/mentions.json')
-       df.to_json('data/mentions.json')
+        print(f"Marking tweet {next_tweet_id} as processed")
+        df.loc[next_tweet['id'].index, 'processed'] = True
+        os.remove('data/mentions.json')
+        df.to_json('data/mentions.json')
 
         # tweet back with dream sequence
+        # Note: multiple methods have been attempted to tweet back the dream sequence to the user.
+        # Attempt: tweet reply. Issue: Twitter refuses our requests with 403 forbidden error.
+        # Attempt: sending the dream sequence to a privately hosted webserver running NGINX in a docker container,
+        # and providing a link to the image in the tweet. Issue: A connection can be established between the two servers,
+        # and the files transferred manually, but this fails within a script, be it here in main, a shell script, or server side
+        # sync tools like lsync.
 
-       load_dotenv(".env")
-       dream_transfer = shlex.split(
-           f"./dream-transfer.sh {os.getenv('PORT')} {os.getenv('USER')} {os.getenv('DOMAIN')}")
-       result = subprocess.run(dream_transfer, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-       print(result.stdout)
-       print(result.stderr))
+        # ssh syncing of dreams to webserver
 
-       bot.tweet(f"@{bot.username_lookup(next_tweet_id)}, you dream sequence is at halliesuenation.ad.rienne.de/{next_tweet_id}_dream_grid.bmp")
+        # load_dotenv(".env")
+        # dream_transfer = shlex.split(
+        #     f"./dream-transfer.sh {os.getenv('PORT')} {os.getenv('USER')} {os.getenv('DOMAIN')}")
+        # result = subprocess.run(dream_transfer, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        # print(result.stdout)
+        # print(result.stderr)
+
+        # bot.tweet(f"@{bot.username_lookup(next_tweet_id)}, you dream sequence is at halliesuenation.ad.rienne.de/{next_tweet_id}_dream_grid.bmp")
+
     else:
         print("All tweets processed")
