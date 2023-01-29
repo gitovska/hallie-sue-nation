@@ -1,7 +1,7 @@
 import re, openai, random
 from dotenv import dotenv_values
 from nltk import sent_tokenize
-
+from random import sample
 
 class Preprocessor():
     def __init__(self):
@@ -135,7 +135,9 @@ class Preprocessor():
         prompts_list_from_pgt3 = [x.replace(",", "") for x in prompts_list_from_pgt3]
 
         # append style
-        prompts_list_from_pgt3 = [x + " in the surreal style" for x in prompts_list_from_pgt3]
+        styles = ["in a surrealist style", "in an impressionist style", "in the style of Art Nouveau", "in a Modernist Style", "in a steampunk style", "in a futuristic style", "in a classical style"]
+        style = sample(styles, 1)[0]
+        prompts_list_from_pgt3 = [x + " " + style for x in prompts_list_from_pgt3]
 
         return prompts_list_from_pgt3
 
