@@ -19,10 +19,10 @@ import os
 def get_next_tweet(df: pd.DataFrame) -> pd.DataFrame:
     unprocessed_tweets = df.where((df['processed'] == False) & (~df['media_key'].isnull()))
     unprocessed_tweets.sort_values(by=['created_at'], inplace=True)
-    if unprocessed_tweets.empty:
-        return False
-    else:
+    if unprocessed_tweets.any():
         return unprocessed_tweets.head(1)
+    else:
+        return False
 
 def get_prompts(tweet: str) -> list[str]:
     prep = Preprocessor()
