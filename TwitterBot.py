@@ -73,8 +73,8 @@ class TwitterBot:
         mentions = json.loads(mentions_response.text, parse_float=str(), parse_int=str())
         return [mention['id'] for mention in mentions['data']]
 
-    def _query_mentions(self, mention_ids: list[str]) -> pd.DataFrame | None:
-
+    def _query_mentions(self, mention_ids: list[str]):
+        #-> pd.DataFrame | None
         if not self.__mentions_df.empty:
             id_list = list(self.__mentions_df['id'].values)
             query_ids = [tweet_id for tweet_id in mention_ids if tweet_id not in id_list]
@@ -202,7 +202,7 @@ class TwitterBot:
                   "reply": {"in_reply_to_tweet_id": str(tweet_id)}}
         print(params)
         url = "https://api.twitter.com/2/tweets"
-        response = self.__oauth.post(url, params=params)
+        response = self.__oauth.post(url, json=params)
 
         if response.status_code in [200, 201]:
             print("Tweet was successfully posted")
@@ -210,11 +210,3 @@ class TwitterBot:
             print("Something went wrong")
             print(response.status_code)
             print(response)
-
-# bot = TwitterBot()
-# image = r"/home/wombat/daisy_dolphin_200_steps_s5_form.png"
-# with open(image, "rb") as binary_file:
-#   binary_data = binary_file.read()
-# tweet_id = 1619129058943713280
-# bot.refresh()
-# bot.reply(tweet_id, image)
