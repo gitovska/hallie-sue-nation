@@ -21,9 +21,6 @@ class Dreamer:
         self.__device_count = jax.device_count()
         rng = self._create_key(0)
         self.__rng = jax.random.split(rng, self.__device_count)
-        self.pipeline, self.params = FlaxStableDiffusionImg2ImgPipeline.from_pretrained(
-            "CompVis/stable-diffusion-v1-4", revision="bf16", dtype=jax.numpy.bfloat16
-        )
         self.__strength = 0.5
         self.__num_inference_steps = 150
         self.__jit = True
@@ -41,13 +38,16 @@ class Dreamer:
 
     def dream(self, prompts: list[str], tweet_id: int, image_url: str):
         init_image = self._get_image(image_url)
-        prompt_ids, processed_image = self.pipeline.prepare_inputs(prompt=prompts,
+        pipeline, params = FlaxStableDiffusionImg2ImgPipeline.from_pretrained(
+            "CompVis/stable-diffusion-v1-4", revision="bf16", dtype=jax.numpy.bfloat16
+        )
+        prompt_ids, processed_image = pipeline.prepare_inputs(prompt=prompts,
                                                                      image=[init_image] * self.__device_count)
-        p_params = replicate(self.params)
+        p_params = replicate(params)
         prompt_ids = shard(prompt_ids)
         processed_image = shard(processed_image)
 
-        output = self.pipeline(
+        output = pipeline(
             prompt_ids=prompt_ids,
             image=processed_image,
             params=p_params,
@@ -59,7 +59,7 @@ class Dreamer:
             width=self.__width).images
 
         output_array = np.asarray(output.reshape((self.__device_count,) + output.shape[-3:]))
-        output_images = self.pipeline.numpy_to_pil(output_array)
+        output_images = pipeline.numpy_to_pil(output_array)
         os.makedirs(f"data/output/{tweet_id}")
         for i in range(len(output_images)):
             output_images[i].save(f"output/{tweet_id}/{tweet_id}_dream_{i+1}.bmp")
