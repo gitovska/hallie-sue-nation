@@ -40,6 +40,12 @@ class Dreamer:
         img = img.resize((768, 512))
         return img
 
+    def _image_grid(self, imgs: list[Image], rows: int, cols: int):
+        w, h = imgs[0].size
+        grid = Image.new('RGB', size=(cols * w, rows * h))
+        for i, img in enumerate(imgs): grid.paste(img, box=(i % cols * w, i // cols * h))
+        return grid
+
     def dream(self, prompts: list[str], tweet_id: int, image_url: str):
         init_image = self._get_image(image_url)
         prompt_ids, processed_image = self.__pipeline.prepare_inputs(prompt=prompts,
@@ -64,3 +70,5 @@ class Dreamer:
         for i in range(len(output_images)):
             output_images[i].save(f"./data/output/{tweet_id}/{tweet_id}_dream_{i+1}.bmp")
 
+        grid = image_grid(output_images, 4, 2)
+        grid.save(f"./data/output/{tweet_id}/{tweet_id}_dream_grid.bmp")
