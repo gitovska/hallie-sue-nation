@@ -3,3 +3,4 @@
 .idea
 mentions.json
 .ipynb_checkpoints
+__pycache__
