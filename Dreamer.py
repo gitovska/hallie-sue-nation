@@ -53,7 +53,7 @@ class Dreamer:
             prompt_ids=prompt_ids,
             image=processed_image,
             params=p_params,
-            prng_seed=rng
+            prng_seed=rng,
             strength=self.__strength,
             num_inference_steps=self.__num_inference_steps,
             jit=self.__jit,
