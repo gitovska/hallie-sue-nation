@@ -61,6 +61,6 @@ class Dreamer:
         output_images = self.__pipeline.numpy_to_pil(np.asarray(output.reshape((self.__device_count,) + output.shape[-3:])))
         os.makedirs(f"data/output/{tweet_id}")
         images = output_images.copy()
-        for i in range(len(output_images)):
+        for i in range(len(images)):
             images[i].save(f"output/{tweet_id}/{tweet_id}_dream_{i+1}.bmp")
 
